@@ -56,3 +56,22 @@ If the same error/fix fails twice in a row (try → error → try → error loop
   (T2V 3.76/3.25/3.74/3.38; I2V 4.04/3.49/3.27/3.59/3.17, source = arXiv:2510.22200).
   Validate by parsing the frontmatter (Ruby/Python YAML) and diffing every value
   against the Markdown tables in the README body — all 9 matched.
+
+### 2026-11-03 (addendum) — Syncing to the HF model repo as a non-member
+- OBSERVATIONS:
+  - HF user `Alextokenizin7873` has no `meituan-longcat` org membership → direct
+    push/upload to `meituan-longcat/LongCat-Video` is impossible; do not try it.
+  - WORKED: community PR — patch a copy of the HF README (do NOT overwrite it with
+    the longer GitHub README) and run:
+    `hf upload meituan-longcat/LongCat-Video /tmp/hf_sync/README.md README.md --repo-type model --create-pr --commit-message "..."`.
+    This created PR #19 (`refs/pr/19`), status open, `main` unchanged.
+  - HF card already had all top-level fields; the only missing piece was
+    `model-index: null` in the API response. HF also already carries
+    `.eval_results/wbench.yaml` (WBench 73.7 / 69.9, PR #16) — the newer
+    eval-results system, valid there because `meituan-longcat/WBench` IS a Hub
+    benchmark dataset. Internal MOS still cannot use that system (no dataset id).
+  - Verify a PR (not a direct commit) by: `grep -c model-index` on
+    `raw/main/README.md` == 0, and the new PR listed at
+    `GET /api/models/<repo>/discussions` with `isPullRequest=true`.
+- TLDR: GitHub fork push (`tokenizin/LongCat-Video@tokenizin-dev`) and HF model-card
+  PR are two separate, independent sync targets. Both are now done for this fix.
