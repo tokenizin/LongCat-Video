@@ -1,0 +1,58 @@
+# LongCat-Video — Agent Rules (self-training log)
+
+## 1. LOOP-BREAK PROTOCOL (mandatory)
+If the same error/fix fails twice in a row (try → error → try → error loop):
+1. STOP retrying variants of the same guess.
+2. WEBSEARCH the exact error / spec (prefer primary docs: huggingface.co/docs, github.com source).
+3. Ask the human with HITL (AskQuestion) when a decision is genuinely theirs
+   (scope, credentials, destructive action, which repo/remote is canonical).
+4. Only then implement — and APPEND what worked to §4 of this file
+   (bug entity + observations + TLDR reasoning) so the issue never recurs.
+
+## 2. SOURCE-FIRST / EVIDENCE RULES
+- Examine source before any change: `README.md`, `run_demo_*.py`,
+  `longcat_video/pipeline_longcat_video*.py`, `longcat_video/modules/*.py`,
+  model `config.json` in `weights/`. Definitions in source supersede error guesses.
+- Evidence hierarchy: source code > tests/examples (`assets/avatar/*.json`) > logs > errors.
+- Map the complete data flow and verify schema/type compatibility at each interface
+  (frontend/CLI args ↔ pipeline ↔ DiT/VAE/text-encoder) before editing.
+- Never propose a solution contradicted by a working example in the repo.
+- No inference without source confirmation. Gather all relevant files first.
+
+## 3. SINGLE SOURCE OF TRUTH (state coherence)
+- Exactly ONE representation per value/concept system-wide.
+  Before adding any state/field/counter/config: search the whole repo for an
+  existing representation, name the canonical one, and reuse only that.
+- Concrete instance: Hugging Face MOS scores live in TWO places in `README.md`
+  (YAML `model-index` + Markdown tables). They MUST stay numerically identical;
+  edit both or neither, and cross-check values after any edit.
+
+## 4. LEARNED KNOWLEDGE (append-only; newest last)
+
+### 2026-11-03 — Hugging Face model-card Metadata UI / Eval Results empty
+- BUG ENTITY: GitHub `README.md` had NO YAML frontmatter, so HF fields
+  (license, language, datasets, metrics, base_model, new_version, pipeline_tag,
+  library_name, tags) and the "Eval Results / View doc" widget had nothing to parse.
+- OBSERVATIONS:
+  - The live HF card `meituan-longcat/LongCat-Video` already declares:
+    `language: [en, zh]`, `license: mit`, `library_name: diffusers`,
+    `pipeline_tag: text-to-video`, `tags: [transformers, diffusers, image-to-video, video-continuation]`.
+    Repo code confirms it: `diffusers` imports + `UMT5EncoderModel`/`AutoTokenizer`
+    from `transformers` in `run_demo_*.py` / `run_streamlit.py`.
+  - MOS numbers are NOT a Hub metric id → do NOT put them in top-level `metrics:`.
+    Structured scores belong in legacy `model-index:` (name/results/task/dataset/metrics/source).
+  - Newer `.eval_results/*.yaml` format REQUIRES a Hub *benchmark dataset* id +
+    `task_id`. An internal MOS benchmark has none → cannot use it; do not invent an id.
+  - Leave unset (no evidence in repo): `datasets:` (no Hub training-dataset id),
+    `base_model:` (this IS the base/foundation model, not a finetune/adapter/quant),
+    `new_version:` (Avatar-1.5 is a sibling model, not a replacement version).
+  - GitHub renders YAML frontmatter as a visible table atop the README; HF parses it.
+    Same file serves both — the table on GitHub is expected, not a bug.
+  - This GitHub fork (`tokenizin/LongCat-Video`, branch `tokenizin-dev`) and the HF
+    model repo are SEPARATE repos. Fixing GitHub's README does not update HF;
+    paste/commit the identical frontmatter to the HF repo's `README.md` too.
+- TLDR / WORKED SOLUTION: Prepend the YAML block above (mirroring the live HF card)
+  plus `model-index` with LongCat-Video's OWN MOS scores only
+  (T2V 3.76/3.25/3.74/3.38; I2V 4.04/3.49/3.27/3.59/3.17, source = arXiv:2510.22200).
+  Validate by parsing the frontmatter (Ruby/Python YAML) and diffing every value
+  against the Markdown tables in the README body — all 9 matched.
