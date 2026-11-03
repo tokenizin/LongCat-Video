@@ -1,3 +1,65 @@
+---
+language:
+- en
+- zh
+license: mit
+library_name: diffusers
+pipeline_tag: text-to-video
+tags:
+- transformers
+- diffusers
+- image-to-video
+- video-continuation
+model-index:
+- name: LongCat-Video
+  results:
+  - task:
+      type: text-to-video
+    dataset:
+      name: Internal Text-to-Video MOS Benchmark
+      type: internal-text-to-video-mos
+    metrics:
+    - name: Text-Alignment
+      type: text-alignment
+      value: 3.76
+    - name: Visual Quality
+      type: visual-quality
+      value: 3.25
+    - name: Motion Quality
+      type: motion-quality
+      value: 3.74
+    - name: Overall Quality
+      type: overall-quality
+      value: 3.38
+    source:
+      name: LongCat-Video Technical Report
+      url: https://arxiv.org/abs/2510.22200
+  - task:
+      type: image-to-video
+    dataset:
+      name: Internal Image-to-Video MOS Benchmark
+      type: internal-image-to-video-mos
+    metrics:
+    - name: Image-Alignment
+      type: image-alignment
+      value: 4.04
+    - name: Text-Alignment
+      type: text-alignment
+      value: 3.49
+    - name: Visual Quality
+      type: visual-quality
+      value: 3.27
+    - name: Motion Quality
+      type: motion-quality
+      value: 3.59
+    - name: Overall Quality
+      type: overall-quality
+      value: 3.17
+    source:
+      name: LongCat-Video Technical Report
+      url: https://arxiv.org/abs/2510.22200
+---
+
 # LongCat-Video
 
 <div align="center">
