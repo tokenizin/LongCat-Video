@@ -75,3 +75,23 @@ If the same error/fix fails twice in a row (try → error → try → error loop
     `GET /api/models/<repo>/discussions` with `isPullRequest=true`.
 - TLDR: GitHub fork push (`tokenizin/LongCat-Video@tokenizin-dev`) and HF model-card
   PR are two separate, independent sync targets. Both are now done for this fix.
+
+### 2026-11-03 (addendum 2) — Bypassing a dormant upstream maintainer queue
+- OBSERVATIONS:
+  - Upstream HF PR queue is dormant: last commit 2025-10-29; PRs #15/#16/#19 all
+    open with zero maintainer events. Legacy `model-index` only goes live on
+    `main` after a maintainer merges — unlike `.eval_results/`, which HF surfaces
+    from open community PRs (WBench PR #16 shows in the API while still open).
+  - WORKED (user-chosen): publish a CARD-ONLY mirror under your own namespace —
+    `Alextokenizin7873/LongCat-Video` (`hf repos create ... --type model --public`,
+    then `hf upload <repo> /tmp/hf_own . --repo-type model`). Identical frontmatter
+    + `LICENSE`, NO weights, prominent "Unofficial, card-only mirror — not
+    affiliated" disclaimer at the top of the body, official repo linked.
+  - Point relative assets (e.g. `assets/longcat_logo.svg`) at the official repo's
+    absolute `resolve/main/...` URL, or the mirrored card renders broken images.
+  - VERIFY via API, not the upload CLI output (it printed "0 uploaded / 0 committed"
+    yet still produced a commit): `GET /api/models/Alextokenizin7873/LongCat-Video`
+    must show `model-index` present with all metric values on `main`.
+- TLDR: When upstream merge is the bottleneck and the license permits (MIT),
+  an own-namespace card-only mirror makes structured eval results render
+  immediately. Keep upstream PR #19 open — merge there supersedes the mirror.
